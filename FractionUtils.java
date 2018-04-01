@@ -24,7 +24,7 @@ public class FractionUtils {
         if (a.getDenominator().equals(b.getDenominator())) {
             Long newNum = a.getNumerator() - b.getNumerator();
             if(newNum<0) {
-                System.out.println("STOP HERE");
+                System.out.println("STOP HERE BLAH");
             }
             return new Fraction(newNum, b.getDenominator());
         } else {

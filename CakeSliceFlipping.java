@@ -14,7 +14,7 @@ public class CakeSliceFlipping {
     public Long countFlips(int a, int b, int c) {
         Fraction segmentA = new Fraction(360L,new Long (a));
         Fraction segmentB = new Fraction(360L,new Long (b));
-        Fraction segmentC = new Fraction(360L, FractionUtils.convertRadical(c, new Fraction(0L,1L),0));
+        Fraction segmentC = new Fraction(360L, FractionUtils.convertRadical(c, new Fraction(0L,1L)));
         List<Fraction> cuts = new ArrayList<>(); cuts.add(segmentA); cuts.add(segmentB); cuts.add(segmentC);
         slices.add(new CakeSegment(false,
                 new Fraction(0L, 1L),
@@ -30,7 +30,7 @@ public class CakeSliceFlipping {
             }
             int startingCutIndex = findKnifePosCakeIndex(knifePosition);
             int endingCutIndex = findKnifePosCakeIndex(newKnifePosition);
-            CakeSegment startingCut = slices.get(startingCutIndex);
+//            CakeSegment startingCut = slices.get(startingCutIndex);
             CakeSegment endingCut = slices.get(endingCutIndex);
             List<CakeSegment> newSlices = new ArrayList<>();
             List<Integer> removeTheseCakeSegments = new ArrayList<>();
@@ -91,17 +91,34 @@ public class CakeSliceFlipping {
                     }
                 }
             }
-            currentCut = cuts.get(flips.intValue() % 3); //------------THis might mess everything up
+            currentCut = cuts.get((int)(flips % 3L)); //------------THis might mess everything up
             knifePosition = newKnifePosition;
         }
         return flips;
     }
 
     private boolean checkTheFrosting(){
+        //Pulls out the 0 slices
         slices = slices.stream()
-                .filter(cS -> (cS.getBeginningPosition().getDoubleValue() != cS.getEndingPosition().getDoubleValue() || flips == 0))
+                .filter(cS -> (cS.getBeginningPosition().getDoubleValue() != cS.getEndingPosition().getDoubleValue() || flips == 0L))
                 .collect(Collectors.toList());
-        return !slices.stream().allMatch(cakeSegment -> cakeSegment.isFrosting() == false && flips != 0);
+        //Checking if all the frosting is on top
+        return !slices.stream().allMatch(cakeSegment -> cakeSegment.isFrosting() == false && flips != 0L);
+
+//        boolean result = false;
+//        if(flips != 0L) {
+//            for(int i = slices.size() - 1; i >= 0; i--) {
+//                CakeSegment cS = slices.get(i);
+//                if(cS.getBeginningPosition().getDoubleValue() == cS.getEndingPosition().getDoubleValue()) {
+//                    slices.remove(i);
+//                } else if(cS.isFrosting()) {
+//                    result = true;
+//                }
+//            }
+//        } else {
+//            result = true;
+//        }
+//        return result;
     }
 
     private int findKnifePosCakeIndex(Fraction knifePosition) {
@@ -110,7 +127,8 @@ public class CakeSliceFlipping {
             double bp = cakeSegment.getBeginningPosition().getDoubleValue();
             double ep = cakeSegment.getEndingPosition().getDoubleValue();
             if(bp > ep || (bp == 0.0 && ep == 0.0 && slices.size() == 1)) {
-                if(bp < knifePosition.getDoubleValue() || ep > knifePosition.getDoubleValue() || ep == knifePosition.getDoubleValue()) {
+                if(bp < knifePosition.getDoubleValue() || ep > knifePosition.getDoubleValue()
+                        || ep == knifePosition.getDoubleValue()) {
                     return i;
                 }
             }

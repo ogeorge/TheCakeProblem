@@ -13,13 +13,32 @@ public class Main {
 //        System.out.println("Execution time: " + minutes + " minutes and " + seconds + " seconds");
 
         int n = 14;
+        long setupStartTime = System.currentTimeMillis();
         FlipSummation flipSummation = new FlipSummation(n);
-        System.out.println("n: " + n + "\nanswer: " + flipSummation.addUpFlips());
+        long setupEndTime = System.currentTimeMillis();
+
+        Long answer = flipSummation.addUpFlips();
+        long executeEndTime = System.currentTimeMillis();
+        System.out.println("n: " + n + "\nanswer: " + answer);
+
+        double totalSetupTime = (setupEndTime - setupStartTime)/(double)60000;
+        int setupMinutes = (int)totalSetupTime;
+        double setupSeconds = (totalSetupTime - setupMinutes) * 60;
+
+        double totalExecTime = (executeEndTime - setupEndTime)/(double)60000;
+        int execMinutes = (int)totalExecTime;
+        double execSeconds = (totalExecTime - execMinutes) * 60;
+
+        System.out.println("\n----------------------------STATS------------------------------------");
         System.out.println("Size of term parameters: " + flipSummation.getTermParameters().size());
+        System.out.println("Set up time: " + setupMinutes + " minutes and " + setupSeconds + " seconds");
+        System.out.println("Execution time: " + execMinutes + " minutes and " + execSeconds + " seconds");
     }
     //Threading
     //Merging pieces
     //memory management
     //Writing to disk
-    //mod fractions
+    //mod fractions ---- this doesnt really help it just takes off a exponents
+    //The longs are just overflowing so I'm getting the wrong values, need to use BigInteger
+    //killer - 9,10,28
 }

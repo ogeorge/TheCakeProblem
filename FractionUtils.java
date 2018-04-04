@@ -1,7 +1,6 @@
 package Euler566;
 
 import java.math.BigInteger;
-import java.util.Comparator;
 
 public class FractionUtils {
     public static double maxPortion = 360.0;
@@ -9,14 +8,21 @@ public class FractionUtils {
     public static Fraction add(Fraction a, Fraction b) {
         if (a.getDenominator().equals(b.getDenominator())) {
             Long newNum = a.getNumerator() + b.getNumerator();
+            if(newNum<0) {
+                System.out.println("STOP HERE BLAH");
+            }
             return new Fraction(newNum, b.getDenominator());
         } else {
-            Long newNum = (a.getNumerator() * b.getDenominator()) + (b.getNumerator() * a.getDenominator());
-            Long newDenom = a.getDenominator() * b.getDenominator();
-            if(newNum<0||newDenom<0||(a.getNumerator() * b.getDenominator()<0)||(b.getNumerator() * a.getDenominator()<0)) {
-                System.out.println("STOP HERE");
-            }
-            return new Fraction(newNum, newDenom);
+            BigInteger aNum = new BigInteger(a.getNumerator().toString());
+            BigInteger aDenom = new BigInteger(a.getDenominator().toString());
+            BigInteger bNum = new BigInteger(b.getNumerator().toString());
+            BigInteger bDenom = new BigInteger(b.getDenominator().toString());
+            BigInteger newNum = aNum.multiply(bDenom).add(bNum.multiply(aDenom));
+            BigInteger newDenom = aDenom.multiply(bDenom);
+            BigInteger divisor = newNum.gcd(newDenom);
+            return new Fraction(
+                    newNum.divide(divisor).longValueExact(),
+                    newDenom.divide(divisor).longValueExact());
         }
     }
 
@@ -28,17 +34,20 @@ public class FractionUtils {
             }
             return new Fraction(newNum, b.getDenominator());
         } else {
-            Long newNum = (a.getNumerator() * b.getDenominator()) - (b.getNumerator() * a.getDenominator());
-            Long newDenom = a.getDenominator() * b.getDenominator();
-            if(newNum<0||newDenom<0||(a.getNumerator() * b.getDenominator()<0)||(b.getNumerator() * a.getDenominator()<0)) {
-                System.out.println("STOP HERE");
-            }
-            return new Fraction(newNum, newDenom);
+            BigInteger aNum = new BigInteger(a.getNumerator().toString());
+            BigInteger aDenom = new BigInteger(a.getDenominator().toString());
+            BigInteger bNum = new BigInteger(b.getNumerator().toString());
+            BigInteger bDenom = new BigInteger(b.getDenominator().toString());
+            BigInteger newNum = aNum.multiply(bDenom).subtract(bNum.multiply(aDenom));
+            BigInteger newDenom = aDenom.multiply(bDenom);
+            BigInteger divisor = newNum.gcd(newDenom);
+            return new Fraction(
+                    newNum.divide(divisor).longValueExact(),
+                    newDenom.divide(divisor).longValueExact());
         }
     }
 
-    public static Fraction convertRadical(int c, Fraction corner, int counter) { //Recursive
-        counter++;
+    public static Fraction convertRadical(int c, Fraction corner) { //Recursive
         double sqrtc = Math.sqrt(c);
 
         int d = (int)sqrtc;
@@ -48,14 +57,9 @@ public class FractionUtils {
         Fraction fractionD = new Fraction(new Long(d),1L);
         Fraction convertedRadical = add(fractionD, ratioDecimalDigits);
         if(sqrtc == convertedRadical.getDoubleValue()){
-//            System.out.println("Went this far: " + counter);
-//            System.out.println(convertedRadical.getNumerator() + "/" + convertedRadical.getDenominator());
             return convertedRadical;
         }
-//        System.out.println("Square root of c:         "+ sqrtc);
-//        System.out.println("Decimal version of ratio: "+ convertedRadical.getDoubleValue());
-//        System.out.println("Continued fraction depth: "+ counter);
-        return convertRadical(c, ratioDecimalDigits, counter);
+        return convertRadical(c, ratioDecimalDigits);
     }
 
     public static Fraction convertRadical(int c, int iterations) { //Iterating
@@ -71,9 +75,20 @@ public class FractionUtils {
 
         Fraction fractionD = new Fraction(new Long(d),1L);
         Fraction convertedRadical = add(fractionD, corner);
-//        System.out.println("\n-------------------------------This is the iteration version--------------------------------------");
-//        System.out.println("Decimal version of ratio: "+ convertedRadical.getDoubleValue());
-//        System.out.println(convertedRadical.getNumerator() + "/" + convertedRadical.getDenominator());
         return convertedRadical;
     }
-}
+
+//    public static Fraction subtract(Fraction a, Fraction b) { // a always has to be bigger
+//        int wholeNumberA = (int)a.getDoubleValue();
+//        Long remainderNumA = a.getNumerator()%a.getDenominator();
+//
+//        int wholeNumberB = (int)b.getDoubleValue();
+//        Long remainderNumB = b.getNumerator()%b.getDenominator();
+//
+//        int newWholeNum = wholeNumberA - wholeNumberB;
+//        Fraction remainder = subtractRemainders(new Fraction(remainderNumA, a.getDenominator()), new Fraction(remainderNumB, b.getDenominator()));
+//
+//        return add(new Fraction(new Long(newWholeNum), 1L), remainder);
+//    }
+
+    }

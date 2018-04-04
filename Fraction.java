@@ -1,5 +1,7 @@
 package Euler566;
 
+import java.math.BigInteger;
+
 public class Fraction {
     private Long numerator;
     private Long denominator;
@@ -13,8 +15,12 @@ public class Fraction {
         reduce();
     }
 
-    public Fraction(Long numerator, Fraction denominator) {
-        this(denominator.getDenominator() * numerator, denominator.getNumerator());
+    public Fraction(Long numerator, Fraction denominator) { //Right now this will just throw an exception if it cant convert BigInteger into Long
+        BigInteger num = new BigInteger(numerator.toString());
+        BigInteger denomsDenominator = new BigInteger(denominator.getDenominator().toString());
+        this.numerator = num.multiply(denomsDenominator).longValueExact(); //I might want to write a function of reduce that will take BigIntegers and reduce them before I set numerator and denominator
+        this.denominator = denominator.getNumerator();
+        reduce();
     }
 
     public Fraction(Fraction numerator, Long denominator) {

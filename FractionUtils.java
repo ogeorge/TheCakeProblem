@@ -16,7 +16,7 @@ public class FractionUtils {
             BigInteger bDenom = new BigInteger(b.getDenominator().toString());
             BigInteger newNum = aNum.multiply(bDenom).add(bNum.multiply(aDenom));
             BigInteger newDenom = aDenom.multiply(bDenom);
-            BigInteger divisor = newNum.gcd(newDenom);
+            BigInteger divisor = newNum.gcd(newDenom).abs();
             return new Fraction(
                     newNum.divide(divisor).longValueExact(),
                     newDenom.divide(divisor).longValueExact());

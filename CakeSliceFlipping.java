@@ -28,70 +28,72 @@ public class CakeSliceFlipping {
             if(newKnifePosition.getDoubleValue() >= 360.0) {
                 newKnifePosition = FractionUtils.subtract(newKnifePosition, new Fraction(360L,1L));
             }
-            int startingCutIndex = findKnifePosCakeIndex(knifePosition);
+            int startingCutIndex = findKnifePosCakeIndex(knifePosition);//I possible dont even need this
             int endingCutIndex = findKnifePosCakeIndex(newKnifePosition);
-//            CakeSegment startingCut = slices.get(startingCutIndex);
             CakeSegment endingCut = slices.get(endingCutIndex);
-            List<CakeSegment> newSlices = new ArrayList<>();
-            List<Integer> removeTheseCakeSegments = new ArrayList<>();
             int inBetweenStart = startingCutIndex + 1;
-            int inBetweenEnd = endingCutIndex - 1;
             int maxIndex = slices.size() - 1;
             if (inBetweenStart > maxIndex) {
                 inBetweenStart = 0;
             }
-            if(inBetweenEnd < 0) {
-                inBetweenEnd = maxIndex;
-            }
-            int iterTotal = inBetweenEnd;
-            if(inBetweenStart > inBetweenEnd) {
-                iterTotal = slices.size() +inBetweenEnd;
-            }
 
-            //adjust both cake slices starting and ending and add them to newSlices in order startingCut first and then endingCut
             CakeSegment newCakeSegment = new CakeSegment(endingCut.isFrosting(),endingCut.getBeginningPosition(),newKnifePosition);
             endingCut.setBeginningPosition(newKnifePosition);
-            Fraction totalAngleDistance = new Fraction(0L,1L);
+            slices.add(endingCutIndex, newCakeSegment);
 
+            int iterTotal = endingCutIndex;
+            if(inBetweenStart > endingCutIndex) {
+                inBetweenStart++;
+                iterTotal = slices.size() + endingCutIndex;
+            }
+
+            iterTotal = inBetweenStart + ((iterTotal - inBetweenStart)/2);
+
+            Fraction frontEndingPosition = newKnifePosition;
+            Fraction backBeginningPosition = knifePosition;
             for(int i = inBetweenStart; i <= iterTotal; i++) {
                 int index = i;
                 if(i >= slices.size()) {
                     index = i - slices.size();
                 }
-                CakeSegment target = slices.get(index);
-                totalAngleDistance = FractionUtils.add(totalAngleDistance, target.findAngleDistance());
-                newSlices.add(target);
-                removeTheseCakeSegments.add(index);
-            }
+                if(endingCutIndex < 0) {
+                    endingCutIndex = slices.size() - 1;
+                }
 
-            //Check if newSlices total angle distance is equal to the currentCut
-            //If they are equal dont change newSlices if they are not clear the newSlices list and just add the newSegment
-            totalAngleDistance = FractionUtils.add(totalAngleDistance, newCakeSegment.findAngleDistance());
-            if(totalAngleDistance.getDoubleValue() != currentCut.getDoubleValue()) {
-                newSlices.clear();
-                removeTheseCakeSegments.clear();
-            }
-            newSlices.add(newCakeSegment);
-
-            for(int j = newSlices.size() - 1; j >= 0; j--){
-                CakeSegment replacement = newSlices.get(j);
-                replacement.setFrosting(!replacement.isFrosting());
-                Fraction angleDistance = replacement.findAngleDistance();
-                if(removeTheseCakeSegments.size() > 0) {
-                    Integer slicesSpot = removeTheseCakeSegments.remove(0);
-                    replacement.setBeginningPosition(slices.get(slicesSpot-1 < 0 ? maxIndex : slicesSpot-1).getEndingPosition());
-                    replacement.setEndingPosition(FractionUtils.add(replacement.getBeginningPosition(),angleDistance));
-                    slices.set(slicesSpot,  replacement);
+                if(index == endingCutIndex) {
+                    CakeSegment middleSlice = slices.get(index);
+                    middleSlice.setFrosting(!middleSlice.isFrosting());
+                    middleSlice.setBeginningPosition(backBeginningPosition);
+                    middleSlice.setEndingPosition(frontEndingPosition); //Could check if the distance between these two is the same as middleSlice.findAngleDIstance()
                 } else {
-                    replacement.setBeginningPosition(slices.get(inBetweenEnd).getEndingPosition());
-                    replacement.setEndingPosition(newKnifePosition);
-                    slices.add(endingCutIndex,replacement);
-                    if(replacement.findAngleDistance().getDoubleValue() != angleDistance.getDoubleValue()) {
-                        System.out.println("------------------HUGE PROBLEM OVER HERE, YOU NEED TO LOOK AT THIS----------------");
+                    CakeSegment frontSwap = slices.get(index);
+                    frontSwap.setFrosting(!frontSwap.isFrosting());
+                    Fraction frontDistance = frontSwap.findAngleDistance();
+                    CakeSegment backSwap = slices.get(endingCutIndex);
+                    backSwap.setFrosting(!backSwap.isFrosting());
+                    Fraction backDistance = backSwap.findAngleDistance();
+
+                    frontSwap.setEndingPosition(frontEndingPosition);
+                    Fraction newFrontBeginning = FractionUtils.subtract(frontSwap.getEndingPosition(), frontDistance);
+                    if(newFrontBeginning.getNumerator() < 0L) {
+                        newFrontBeginning = FractionUtils.add(new Fraction(360L,1L), newFrontBeginning);
                     }
+                    frontSwap.setBeginningPosition(newFrontBeginning);
+                    slices.set(endingCutIndex,frontSwap);
+
+                    backSwap.setBeginningPosition(backBeginningPosition);
+                    Fraction newBackEnding = FractionUtils.add(backSwap.getBeginningPosition(), backDistance);
+                    if(newBackEnding.getDoubleValue() >= 360.0) {
+                        newBackEnding = FractionUtils.subtract(newBackEnding, new Fraction(360L, 1L));
+                    }
+                    backSwap.setEndingPosition(newBackEnding);
+                    slices.set(index,backSwap);
+                    endingCutIndex--;
+                    frontEndingPosition = frontSwap.getBeginningPosition();
+                    backBeginningPosition = backSwap.getEndingPosition();
                 }
             }
-            currentCut = cuts.get((int)(flips % 3L)); //------------THis might mess everything up
+            currentCut = cuts.get((int)(flips % 3L));
             knifePosition = newKnifePosition;
         }
         return flips;
@@ -104,21 +106,6 @@ public class CakeSliceFlipping {
                 .collect(Collectors.toList());
         //Checking if all the frosting is on top
         return !slices.stream().allMatch(cakeSegment -> cakeSegment.isFrosting() == false && flips != 0L);
-
-//        boolean result = false;
-//        if(flips != 0L) {
-//            for(int i = slices.size() - 1; i >= 0; i--) {
-//                CakeSegment cS = slices.get(i);
-//                if(cS.getBeginningPosition().getDoubleValue() == cS.getEndingPosition().getDoubleValue()) {
-//                    slices.remove(i);
-//                } else if(cS.isFrosting()) {
-//                    result = true;
-//                }
-//            }
-//        } else {
-//            result = true;
-//        }
-//        return result;
     }
 
     private int findKnifePosCakeIndex(Fraction knifePosition) {

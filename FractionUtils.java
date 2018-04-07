@@ -8,9 +8,6 @@ public class FractionUtils {
     public static Fraction add(Fraction a, Fraction b) {
         if (a.getDenominator().equals(b.getDenominator())) {
             Long newNum = a.getNumerator() + b.getNumerator();
-            if(newNum<0) {
-                System.out.println("STOP HERE BLAH");
-            }
             return new Fraction(newNum, b.getDenominator());
         } else {
             BigInteger aNum = new BigInteger(a.getNumerator().toString());
@@ -29,9 +26,6 @@ public class FractionUtils {
     public static Fraction subtract(Fraction a, Fraction b) { // a always has to be bigger
         if (a.getDenominator().equals(b.getDenominator())) {
             Long newNum = a.getNumerator() - b.getNumerator();
-            if(newNum<0) {
-                System.out.println("STOP HERE BLAH");
-            }
             return new Fraction(newNum, b.getDenominator());
         } else {
             BigInteger aNum = new BigInteger(a.getNumerator().toString());
@@ -40,7 +34,7 @@ public class FractionUtils {
             BigInteger bDenom = new BigInteger(b.getDenominator().toString());
             BigInteger newNum = aNum.multiply(bDenom).subtract(bNum.multiply(aDenom));
             BigInteger newDenom = aDenom.multiply(bDenom);
-            BigInteger divisor = newNum.gcd(newDenom);
+            BigInteger divisor = newNum.gcd(newDenom).abs();
             return new Fraction(
                     newNum.divide(divisor).longValueExact(),
                     newDenom.divide(divisor).longValueExact());
@@ -77,18 +71,4 @@ public class FractionUtils {
         Fraction convertedRadical = add(fractionD, corner);
         return convertedRadical;
     }
-
-//    public static Fraction subtract(Fraction a, Fraction b) { // a always has to be bigger
-//        int wholeNumberA = (int)a.getDoubleValue();
-//        Long remainderNumA = a.getNumerator()%a.getDenominator();
-//
-//        int wholeNumberB = (int)b.getDoubleValue();
-//        Long remainderNumB = b.getNumerator()%b.getDenominator();
-//
-//        int newWholeNum = wholeNumberA - wholeNumberB;
-//        Fraction remainder = subtractRemainders(new Fraction(remainderNumA, a.getDenominator()), new Fraction(remainderNumB, b.getDenominator()));
-//
-//        return add(new Fraction(new Long(newWholeNum), 1L), remainder);
-//    }
-
-    }
+}

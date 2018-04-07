@@ -12,6 +12,10 @@ public class Fraction {
     public Fraction(Long numerator, Long denominator) {
         this.numerator = numerator;
         this.denominator = denominator;
+        if(this.denominator < 0L) {
+            this.denominator = this.denominator * -1;
+            this.numerator = this.numerator * -1;
+        }
         reduce();
     }
 
@@ -20,6 +24,10 @@ public class Fraction {
         BigInteger denomsDenominator = new BigInteger(denominator.getDenominator().toString());
         this.numerator = num.multiply(denomsDenominator).longValueExact(); //I might want to write a function of reduce that will take BigIntegers and reduce them before I set numerator and denominator
         this.denominator = denominator.getNumerator();
+        if(this.denominator < 0L) {
+            this.denominator = this.denominator * -1;
+            this.numerator = this.numerator * -1;
+        }
         reduce();
     }
 
@@ -36,6 +44,8 @@ public class Fraction {
             return;
 
         Long gcd = findGCD(numerator, denominator);
+        if(gcd < 0L)
+            gcd = gcd * -1;
         numerator = numerator/gcd;
         denominator = denominator/gcd;
     }

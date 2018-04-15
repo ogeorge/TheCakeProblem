@@ -5,9 +5,7 @@ import static Euler566.FractionUtils.maxPortion;
 public class CakeSegment {
     private boolean frosting;
     private Fraction beginningPosition;
-    private double beginDouble;
     private Fraction endingPosition;
-    private double endDouble;
 
     public CakeSegment(boolean frosting, Fraction beginningPosition, Fraction endingPosition) {
         this.frosting = frosting;
@@ -18,8 +16,6 @@ public class CakeSegment {
         this.endingPosition = endingPosition.getDoubleValue() >= maxPortion
                 ? FractionUtils.subtract(endingPosition, new Fraction(360L,1L))
                 :endingPosition;
-        beginDouble = beginningPosition.getDoubleValue();
-        endDouble = endingPosition.getDoubleValue();
     }
 
     public boolean isFrosting() {
@@ -38,7 +34,6 @@ public class CakeSegment {
         this.beginningPosition = beginningPosition.getDoubleValue() >= maxPortion
                 ? FractionUtils.subtract(beginningPosition, new Fraction(360L,1L))
                 : beginningPosition;
-        beginDouble = beginningPosition.getDoubleValue();
     }
 
     public Fraction getEndingPosition() {
@@ -49,7 +44,6 @@ public class CakeSegment {
         this.endingPosition = endingPosition.getDoubleValue() >= maxPortion
                 ? FractionUtils.subtract(endingPosition, new Fraction(360L,1L))
                 :endingPosition;
-        endDouble = endingPosition.getDoubleValue();
     }
 
     public Fraction findAngleDistance() {
